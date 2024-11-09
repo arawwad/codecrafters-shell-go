@@ -14,6 +14,7 @@ var builtins = []string{
 	"echo",
 	"type",
 	"pwd",
+	"cd",
 }
 
 func main() {
@@ -39,6 +40,10 @@ func main() {
 		}
 		if command == "pwd" {
 			pwdCommand()
+			continue
+		}
+		if command == "cd" {
+			cdCommand(args[0])
 			continue
 		}
 		if path, ok := getPath(command); ok {
@@ -118,5 +123,11 @@ func pwdCommand() {
 		println(err)
 	} else {
 		println(pwd)
+	}
+}
+
+func cdCommand(path string) {
+	if err := os.Chdir(path); err != nil {
+		fmt.Fprintf(os.Stdout, "cd: %s: No such file or directory\n", path)
 	}
 }
