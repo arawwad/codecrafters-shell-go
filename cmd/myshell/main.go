@@ -13,6 +13,7 @@ var builtins = []string{
 	"exit",
 	"echo",
 	"type",
+	"pwd",
 }
 
 func main() {
@@ -34,6 +35,10 @@ func main() {
 		}
 		if command == "type" {
 			typeCommand(args[0])
+			continue
+		}
+		if command == "pwd" {
+			pwdCommand()
 			continue
 		}
 		if path, ok := getPath(command); ok {
@@ -105,4 +110,13 @@ func getPath(commandName string) (string, bool) {
 	}
 
 	return "", false
+}
+
+func pwdCommand() {
+	pwd, err := os.Getwd()
+	if err != nil {
+		println(err)
+	} else {
+		println(pwd)
+	}
 }
