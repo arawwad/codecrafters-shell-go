@@ -127,6 +127,9 @@ func pwdCommand() {
 }
 
 func cdCommand(path string) {
+	if path == "~" {
+		path, _ = os.UserHomeDir()
+	}
 	if err := os.Chdir(path); err != nil {
 		fmt.Fprintf(os.Stdout, "cd: %s: No such file or directory\n", path)
 	}
