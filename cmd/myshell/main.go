@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"os/exec"
 	"slices"
 	"strings"
 )
@@ -33,6 +34,20 @@ func main() {
 		}
 		if command == "type" {
 			typeCommand(args[0])
+			continue
+		}
+		if path, ok := getPath(command); ok {
+			cmd := exec.Command(path, args...)
+			output, err := cmd.CombinedOutput()
+
+			if err != nil {
+				fmt.Fprintf(os.Stdout, err.Error())
+			}
+
+			if _, err = os.Stdout.Write(output); err != nil {
+				fmt.Fprintf(os.Stdout, err.Error())
+			}
+
 			continue
 		}
 		fmt.Fprintf(os.Stdout, "%s: command not found\n", command)
@@ -66,20 +81,28 @@ func echoCommand(args []string) {
 
 func typeCommand(commandName string) {
 
-	paths := strings.Split(os.Getenv("PATH"), ":")
-
 	if slices.Contains(builtins, commandName) {
 		fmt.Fprintf(os.Stdout, "%s is a shell builtin\n", commandName)
 		return
 	}
+	if path, ok := getPath(commandName); ok {
+		fmt.Fprintf(os.Stdout, "%s is %s\n", commandName, path)
+		return
+	}
+	fmt.Fprintf(os.Stdout, "%s: not found\n", commandName)
+}
+
+func getPath(commandName string) (string, bool) {
+	paths := strings.Split(os.Getenv("PATH"), ":")
+
 	for _, path := range paths {
 		pathFiles, _ := os.ReadDir(path)
 		for _, dirEntry := range pathFiles {
 			if dirEntry.Name() == commandName {
-				fmt.Fprintf(os.Stdout, "%s is %s/%s\n", commandName, path, commandName)
-				return
+				return fmt.Sprintf("%s/%s", path, commandName), true
 			}
 		}
 	}
-	fmt.Fprintf(os.Stdout, "%s: not found\n", commandName)
+
+	return "", false
 }
