@@ -4,8 +4,15 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"slices"
 	"strings"
 )
+
+var builtins = []string{
+	"exit",
+	"echo",
+	"type",
+}
 
 func main() {
 	for {
@@ -25,11 +32,21 @@ func main() {
 		args := inputParts[1:]
 		if command == "exit" {
 			os.Exit(0)
-		} else if command == "echo" {
-			fmt.Fprintf(os.Stdout, "%s\n", strings.Join(args, " "))
-		} else {
-			fmt.Fprintf(os.Stdout, "%s: command not found\n", command)
+			continue
 		}
+		if command == "echo" {
+			fmt.Fprintf(os.Stdout, "%s\n", strings.Join(args, " "))
+			continue
+		}
+		if command == "type" {
+			if slices.Contains(builtins, args[0]) {
+				fmt.Fprintf(os.Stdout, "%s is a shell builtin\n", args[0])
+			} else {
+				fmt.Fprintf(os.Stdout, "%s: not found\n", args[0])
+			}
+			continue
+		}
+		fmt.Fprintf(os.Stdout, "%s: command not found\n", command)
 
 	}
 }
