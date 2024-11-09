@@ -16,8 +16,12 @@ func main() {
 		if err != nil {
 			fmt.Println(err)
 		} else {
-			command := strings.TrimSpace(input)
-			fmt.Fprintf(os.Stdout, "%s: command not found\n", command)
+			command := strings.Fields(strings.TrimSpace(input))[0]
+			if command == "exit" {
+				os.Exit(0)
+			} else {
+				fmt.Fprintf(os.Stdout, "%s: command not found\n", command)
+			}
 		}
 
 	}
